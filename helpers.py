@@ -1,6 +1,6 @@
 import requests
 
-def load_html(path):
+def read_text(path):
     try:
         with open(path, 'r', encoding='utf-8') as file:
             html = file.read()
