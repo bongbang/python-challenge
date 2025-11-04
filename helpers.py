@@ -1,17 +1,19 @@
 import requests
 
-def read_text(path):
-    try:
-        with open(path, 'r', encoding='utf-8') as file:
-            html = file.read()
-    except:
+def read_text(*paths):
+    for path in paths:
+        print(f'Loading from {path} ...', end='')
         try:
-            html = requests.get(path).text
+            with open(path, 'r', encoding='utf-8') as file:
+                text = file.read()
         except:
-            print('Failed to load from path/URL.')
-            return
-
-    return html
+            try:
+                text = requests.get(path).text
+            except:
+                print(' FAILED')
+                continue
+        print(' successful')
+        return text
 
 def extract_string(original, start_snippet, end_snippet, inclusive=True):
     if inclusive:
