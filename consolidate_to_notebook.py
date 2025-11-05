@@ -6,6 +6,8 @@ Creates all_challenges_consolidated.ipynb with markdown and code cells.
 
 import glob
 import re
+import subprocess
+import sys
 import nbformat
 from nbformat.v4 import new_notebook, new_markdown_cell, new_code_cell
 from pathlib import Path
@@ -83,7 +85,7 @@ def create_notebook(py_files, md_files):
         if md_file:
             try:
                 with open(md_file, 'r', encoding='utf-8') as f:
-                    md_content = f.read()
+                    md_content = f.read().strip()
                 nb.cells.append(new_markdown_cell(f'## Challenge {main_num}' + (f'_1' if sub_num > 0 else '')))
                 nb.cells.append(new_markdown_cell(md_content))
             except Exception as e:
@@ -92,7 +94,7 @@ def create_notebook(py_files, md_files):
         # Add code cell with .py content
         try:
             with open(py_file, 'r', encoding='utf-8') as f:
-                py_content = f.read()
+                py_content = f.read().strip()
 
             # Add challenge header
             nb.cells.append(new_markdown_cell(f'### Challenge {main_num}' + (f'_1' if sub_num > 0 else '') + ' Solution'))
@@ -106,6 +108,29 @@ def create_notebook(py_files, md_files):
             print(f"Error processing {py_file}: {e}")
 
     return nb
+
+
+def execute_notebook(notebook_path):
+    """Execute notebook using jupyter nbconvert."""
+    print(f"\nExecuting notebook...")
+
+    try:
+        result = subprocess.run(
+            ['jupyter', 'nbconvert', '--execute', '--to', 'notebook', '--inplace', notebook_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        print("Successfully executed all cells")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing notebook: {e}")
+        print(f"stdout: {e.stdout}")
+        print(f"stderr: {e.stderr}")
+        return False
+    except FileNotFoundError:
+        print("Error: jupyter command not found. Please ensure Jupyter is installed.")
+        return False
 
 
 def main():
@@ -125,8 +150,13 @@ def main():
     with open(output_file, 'w', encoding='utf-8') as f:
         nbformat.write(nb, f)
 
-    print(f"✓ Successfully created {output_file}")
+    print(f"OK Successfully created {output_file}")
     print(f"  Total cells: {len(nb.cells)}")
+
+    # Execute the notebook
+    execute_notebook(output_file)
+
+    print(f"\nDone! Open {output_file} in Jupyter to view results.")
 
 
 if __name__ == '__main__':
