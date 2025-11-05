@@ -86,7 +86,6 @@ def create_notebook(py_files, md_files):
             try:
                 with open(md_file, 'r', encoding='utf-8') as f:
                     md_content = f.read().strip()
-                nb.cells.append(new_markdown_cell(f'## Challenge {main_num}' + (f'_1' if sub_num > 0 else '')))
                 nb.cells.append(new_markdown_cell(md_content))
             except Exception as e:
                 print(f"Warning: Could not read {md_file}: {e}")
@@ -95,9 +94,6 @@ def create_notebook(py_files, md_files):
         try:
             with open(py_file, 'r', encoding='utf-8') as f:
                 py_content = f.read().strip()
-
-            # Add challenge header
-            nb.cells.append(new_markdown_cell(f'### Challenge {main_num}' + (f'_1' if sub_num > 0 else '') + ' Solution'))
 
             # Add the code as a code cell
             nb.cells.append(new_code_cell(py_content))
